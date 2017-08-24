@@ -1,30 +1,62 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyScript : MonoBehaviour {
+public class EnemyScript : MonoBehaviour 
+{
 
-	public int enemyHealth;
+	public float enemySpeed;
+	public float enemyHealth;
+	public float attackRange;
+	public int enemyDamage = 1;
+	public int scoreValue;
+
+	// Bullet
 	public GameObject bullet;
-	private BulletScript bulletScript;
+	public BulletScript bulletScript;
 
-	void Start () {
+	// HUD
+	public GameObject HUD;
+	public HUDScript hudScript;
+
+	// Enemy spawner
+	public GameObject enemySpawner;
+	public EnemySpawnerScript enemySpawnerScript;
+
+
+	// Use this for initialization
+	void Start () 
+	{
 		bulletScript = bullet.GetComponent<BulletScript> ();
+
+		HUD = GameObject.FindGameObjectWithTag ("Hud");
+		hudScript = HUD.GetComponent<HUDScript> ();
+
+		enemySpawner = GameObject.FindGameObjectWithTag ("EnemySpawner");
+		enemySpawnerScript = enemySpawner.GetComponent<EnemySpawnerScript> ();
 	}
 	
-	void Update () {
-		DestroyEnemy ();
+	// Update is called once per frame
+	void Update () 
+	{
+		if (enemyHealth == 0) 
+		{
+			Destroy(gameObject);
+			Debug.Log("Enemy destroyed!");
+			hudScript.score += scoreValue;
+			hudScript.enemiesKilledCounter++;
+			enemySpawnerScript.spawnedEnemies--;
+		}
+
 	}
 
-	void OnCollisionEnter2D(Collision2D coll){
-		if (coll.gameObject.tag == "Bullet") {
-			enemyHealth -= bulletScript.bulletDamage;
-			Destroy (coll.gameObject);
+	void OnCollisionEnter2D(Collision2D coll)
+	{
+		if (coll.gameObject.tag == "Bullet") 
+		{
+			enemyHealth = enemyHealth - bulletScript.bulletDamage;
+			Debug.Log ("Enemy health is now " + enemyHealth);
+			Destroy(coll.gameObject);
 		}
-	}
 
-	void DestroyEnemy() {
-		if (enemyHealth <= 0) {
-			Destroy (gameObject);
-		}
 	}
 }
