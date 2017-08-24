@@ -2,24 +2,44 @@
 using System.Collections;
 
 public class CameraScript : MonoBehaviour {
-
-	public GameObject target;
-	private int cameraDistanceZ = -1;
-
-	void Start () {
-		
-		transform.position = new Vector3(target.transform.position.x, target.transform.position.y, 
-				cameraDistanceZ);
-		
-		Camera.main.aspect = 16f / 10f;
-		
 	
+    public Transform target;
+    public Camera cam;
+
+    // Camera bounds
+    public Vector3 minCamera;
+    public Vector3 maxCamera;
+
+	public GameObject player;
+	public PlayerScript playerScript;
+
+	public Vector3 cameraPosition;
+
+    public void Start()
+    {
+		cameraPosition = transform.position;
+		playerScript = player.GetComponent<PlayerScript> ();
+        cam = GetComponent<Camera>();
+        cam.aspect = 16f / 10f;
+
+    }
+
+    void Update()
+    {
+		cam.transform.position = new Vector3(
+			Mathf.Clamp(transform.position.x, minCamera.x, maxCamera.x),
+			Mathf.Clamp(transform.position.y, minCamera.y, maxCamera.y),
+ 			Mathf.Clamp(transform.position.z, minCamera.z, maxCamera.z));
+    }
+
+	void FixedUpdate () 
+	{
+        // Follow player
+        if (target)
+        {
+			transform.position = Vector3.Lerp(transform.position, target.position, 0.05f) + new Vector3(0,0, -10);
+        }
+
 	}
 
-	void Update () {
-
-		transform.position = new Vector3 (target.transform.position.x, target.transform.position.y, 
-			cameraDistanceZ);
-		
-	}
 }
